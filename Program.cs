@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿using System.Numerics; 
 using System.Runtime.CompilerServices;
 using ShibaEngineCore;
 
@@ -12,34 +12,24 @@ public class Test2 : Component
     }
     public override void Update()
     {
-        if (Input.GetKeyDown(KeyCode.KEY_T))
-        {
-            Transform.Position += Vector3.UnitY * speed * Time.deltaTime;
-        }
     }
 }
-public class Test : Component
+public class Spinning : Component
 {
-    public uint otherEntity;
-    public float speed;
     public Physics physics;
+    public Vector3 direction;
+    public float speed;
     public override void Start()
     {
-        physics = EngineCalls.GetCoreComponent<Physics>(entity);
+        System.Console.WriteLine("here");
     }
     public override void Update()
     {
+            ShibaEngineCore.Console.LogMessage("here");
         if (Input.GetKeyDown(KeyCode.KEY_SPACE))
         {
-            physics.UseGravity = false;
-        }
-        if (Input.GetKeyDown(KeyCode.KEY_F))
-        {
-            physics.UseGravity = true;
-        }
-        if (Input.GetKeyDown(KeyCode.KEY_P))
-        {
-            physics.GravityDirection = Vector3.UnitY;
+            transform.Position += direction * speed * Time.deltaTime;
+            ShibaEngineCore.Console.LogMessage(transform.Position.ToString());
         }
     }
 }

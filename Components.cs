@@ -4,17 +4,60 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace ShibaEngineCore
 {
+    public static class Components
+    {
+        /// <summary>
+        /// Updates the external core component, should be called from the core component bindings when a property is set
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public extern static void UpdateExternCoreComponent(uint entity, string name, object value);
+        public static void UpdateExternCoreComponent<T>(uint entity, T value) where T : CoreComponent
+        {
+            UpdateExternCoreComponent(entity, typeof(T).Name, value);
+        }
 
+
+        /// <summary>
+        /// Updating a core component on the scripting side to the latest values on the external side, should be called from a core component binding when the get property is called
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public extern static void UpdateCoreComponent(uint entity, string name);
+        public static void UpdateCoreComponent<T>(uint entity) where T : CoreComponent
+        {
+            UpdateCoreComponent(entity, typeof(T).Name);
+        }
+
+        /// <summary>
+        /// Getting a reference to the core component from the external side
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public extern static object GetCoreComponent(uint entity, string name);
+        public static T GetCoreComponent<T>(uint entity) where T : CoreComponent
+        {
+            return GetCoreComponent(entity, typeof(T).Name) as T;
+        }
+    }
     public class Component
     {
         public uint entity;
-        public Transform Transform
+        public Transform transform;
+        private void Initialize()
         {
-            get { return EngineCalls.GetTransform(entity); }
-            set { EngineCalls.SetTransform(entity, value); }
+            System.Console.WriteLine("initialized");
+            transform = Components.GetCoreComponent<Transform>(entity);
         }
         public virtual void Start() { }
         public virtual void Update() { }
@@ -28,63 +71,19 @@ namespace ShibaEngineCore
             return EngineCalls.GetComponent<T>(entity);
         }
     }
+    /// <summary>
+    /// This is the class that all of the bindings for core components should inherit from
+    /// </summary>
     public class CoreComponent
     {
         public uint entity;
-    }
-    public class Physics : CoreComponent
-    {
-        private Vector3 velocity;
-        public Vector3 Velocity { get { return EngineCalls.GetCoreComponent<Physics>(entity).velocity; } set { velocity = value; EngineCalls.SetCoreComponent<Physics>(entity, this); } }
-
-
-        private bool useGravity;
-        public bool UseGravity { get { return EngineCalls.GetCoreComponent<Physics>(entity).useGravity; } set { useGravity = value; EngineCalls.SetCoreComponent<Physics>(entity, this); } }
-        private float gravity;
-        public float Gravity { get { return EngineCalls.GetCoreComponent<Physics>(entity).gravity;} set { gravity = value; EngineCalls.SetCoreComponent<Physics>(entity, this);  } }
-        private Vector3 gravityDirection;
-        public Vector3 GravityDirection { get { return EngineCalls.GetCoreComponent<Physics>(entity).gravityDirection; } set { gravityDirection = value; EngineCalls.SetCoreComponent<Physics>(entity, this); } }
-
-
-        private bool useDrag;
-        public bool UseDrag { get { return EngineCalls.GetCoreComponent<Physics>(entity).useDrag; } set { useDrag = value; EngineCalls.SetCoreComponent<Physics>(entity, this); } }
-        private float drag;
-        public float Drag { get { return EngineCalls.GetCoreComponent<Physics>(entity).drag; } set { drag = value; EngineCalls.SetCoreComponent<Physics>(entity, this); } }
-    }
-    public class MeshCollisionBox : CoreComponent
-    {
-        private Vector3 min;
-        public Vector3 Min { get { return EngineCalls.GetCoreComponent<MeshCollisionBox>(entity).min; } set { min = value; EngineCalls.SetCoreComponent<MeshCollisionBox>(entity, this); } }
-
-        private Vector3 max;
-        public Vector3 Max { get { return EngineCalls.GetCoreComponent<MeshCollisionBox>(entity).max; } set { max = value; EngineCalls.SetCoreComponent<MeshCollisionBox>(entity, this); } }
-
-    }
-    public class MeshRenderer : CoreComponent
-    {
-        private string modelPath = "";
-        public string ModelPath { get { return EngineCalls.GetCoreComponent<MeshRenderer>(entity).modelPath; } set { modelPath = value; EngineCalls.SetCoreComponent<MeshRenderer>(entity, this); } }
-    }
-    public class Transform
-    {
-        public uint entity;
-
-        public Transform(uint entity, Vector3 pos, Vector3 rot, Vector3 piv, Vector3 sca)
+        public void UpdateSelf()
         {
-            this.entity = entity;
-            this.pos = pos;
-            this.rot = rot;
-            this.piv = piv;
-            this.sca = sca;
+            Components.UpdateCoreComponent(entity, GetType().Name);
         }
-        private Vector3 pos;
-        public Vector3 Position { get { return pos; } set { pos = value; EngineCalls.SetTransform(entity, this); } }
-
-        private Vector3 rot;
-        public Vector3 Rotation { get { return rot; } set { rot = value;  EngineCalls.SetTransform(entity, this); } }
-        private Vector3 piv;
-        public Vector3 Pivot { get { return piv; } set { piv = value;  EngineCalls.SetTransform(entity, this); } }
-        private Vector3 sca;
-        public Vector3 Scale { get { return sca; } set { sca = value;  EngineCalls.SetTransform(entity, this); } }
+        public void UpdateExtern()
+        {
+            Components.UpdateExternCoreComponent(entity, GetType().Name, this);
+        }
     }
 }

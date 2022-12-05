@@ -19,19 +19,6 @@ namespace ShibaEngineCore
         public extern static uint CreateEntity();
 
 
-
-        public static void SetTransform(uint entity, Transform transform)
-        {
-            SetTransform(entity, transform.Position, transform.Rotation, transform.Pivot, transform.Scale);
-        }
-
-        public static Transform GetTransform(uint entity)
-        {
-            GetTransform(entity, out var position, out var rotaition, out var pivot, out var scale);
-            Transform transform = new Transform(entity, position, rotaition, pivot, scale);
-            return transform;
-        }
-
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         public extern static uint[] FindComponentsInScene(string name);
         public static void AddComponent<T>(uint entity, T value) where T : Component
@@ -40,20 +27,6 @@ namespace ShibaEngineCore
         }
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         private extern static void AddComponent(uint entity, string typeName, object value);
-
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        private extern static void SetCoreComponent(uint entity, string name, object value);
-        public static void SetCoreComponent<T>(uint entity, T value) where T : CoreComponent
-        {
-            SetCoreComponent(entity, typeof(T).Name, value);
-        }
-
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        private extern static object GetCoreComponent(uint entity, string name);
-        public static T GetCoreComponent<T>(uint entity) where T : CoreComponent
-        {
-            return GetCoreComponent(entity, typeof(T).Name) as T;
-        }
 
         public static T GetComponent<T>(uint entity) where T : Component
         {
