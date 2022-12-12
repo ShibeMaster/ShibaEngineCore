@@ -1,5 +1,4 @@
 ﻿using System.Numerics; 
-using System.Runtime.CompilerServices;
 using ShibaEngineCore;
 
 
@@ -14,22 +13,16 @@ public class Test2 : Component
     {
     }
 }
-public class Spinning : Component
+public class Testing : Component
 {
-    public Physics physics;
-    public Vector3 direction;
-    public float speed;
+    public Instance otherEntity = new Instance();
     public override void Start()
     {
-        System.Console.WriteLine("here");
+        ShibaEngineCore.Console.LogMessage(otherEntity.name);
+        ShibaEngineCore.Console.LogMessage(otherEntity.GetCoreComponent<Transform>().Position.ToString());
     }
     public override void Update()
     {
-            ShibaEngineCore.Console.LogMessage("here");
-        if (Input.GetKeyDown(KeyCode.KEY_SPACE))
-        {
-            transform.Position += direction * speed * Time.deltaTime;
-            ShibaEngineCore.Console.LogMessage(transform.Position.ToString());
-        }
+
     }
 }

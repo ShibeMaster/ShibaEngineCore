@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace ShibaEngineCore
 {
     public static class Components
     {
+
         /// <summary>
         /// Updates the external core component, should be called from the core component bindings when a property is set
         /// </summary>
@@ -37,6 +39,7 @@ namespace ShibaEngineCore
             UpdateCoreComponent(entity, typeof(T).Name);
         }
 
+
         /// <summary>
         /// Getting a reference to the core component from the external side
         /// </summary>
@@ -49,27 +52,27 @@ namespace ShibaEngineCore
         {
             return GetCoreComponent(entity, typeof(T).Name) as T;
         }
+
+        public static Instance GetInstance(uint entity)
+        {
+            return GetEntityInstance(entity) as Instance;
+        }
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern static object GetEntityInstance(uint entity);
     }
     public class Component
     {
         public uint entity;
         public Transform transform;
+        public Instance instance;
         private void Initialize()
         {
             System.Console.WriteLine("initialized");
             transform = Components.GetCoreComponent<Transform>(entity);
+            instance = Components.GetInstance(entity);
         }
         public virtual void Start() { }
         public virtual void Update() { }
-
-        public void AddComponent<T>(T value) where T : Component
-        {
-            EngineCalls.AddComponent<T>(entity, value);
-        }
-        public T GetComponent<T>() where T : Component
-        {
-            return EngineCalls.GetComponent<T>(entity);
-        }
     }
     /// <summary>
     /// This is the class that all of the bindings for core components should inherit from

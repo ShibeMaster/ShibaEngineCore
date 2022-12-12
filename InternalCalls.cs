@@ -32,6 +32,9 @@ namespace ShibaEngineCore
         {
             return GetComponent(entity, typeof(T).Name) as T;
         }
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static object[] FindComponentsInChildren(uint entity, string type);
+
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         private extern static object GetComponent(uint entity, string name);
