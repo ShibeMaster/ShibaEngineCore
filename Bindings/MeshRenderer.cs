@@ -10,5 +10,7 @@ namespace ShibaEngineCore
     {
         private string modelPath = "";
         public string ModelPath { get { UpdateSelf(); return modelPath; } set { modelPath = value; UpdateExtern(); } }
+        private string shader = "";
+        public string Shader { get { UpdateSelf(); return shader; } set { shader = value; UpdateExtern(); } }
     }
 }

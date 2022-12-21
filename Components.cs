@@ -67,12 +67,10 @@ namespace ShibaEngineCore
         public Instance instance;
         private void Initialize()
         {
-            System.Console.WriteLine("initialized");
             transform = Components.GetCoreComponent<Transform>(entity);
+            System.Console.WriteLine("initialized as " + entity);
             instance = Components.GetInstance(entity);
         }
-        public virtual void Start() { }
-        public virtual void Update() { }
     }
     /// <summary>
     /// This is the class that all of the bindings for core components should inherit from
